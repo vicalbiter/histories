@@ -1,4 +1,4 @@
-# Basic libraries
+# Math, numpy and pandas
 import math
 import numpy as np
 import pandas as pd
