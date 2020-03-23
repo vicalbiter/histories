@@ -213,7 +213,7 @@ class ProbModel:
             return string
         else:
             for seed in seeds:
-                strings.append(string_generator(string + seed, seeds, num - 1))
+                strings.append(self.string_generator(string + seed, seeds, num - 1))
         return strings
 
     def string_padding(self, pre_padding, strings, post_padding):
@@ -380,49 +380,7 @@ class BayesianModel(ProbModel):
                     user_data.at[index, col] = 0
         return user_data
 
-class NBA(BayesianModel):
-    
-    # Class constructor
-    def __init__(self):
-        self.scores_dictionary = {}
-        self.predicted_scores = {}
-        self.query_features = {}
-        self.classFeature = ""
-        self.classCategory = ""
-    
-    # Train the model, given certain query_features, a classFeature-classCategory and some training data Xt
-    def train(self, query_features, classFeature, classCategory, Xt):
-        # Get the dictionary of scores, in relation to classFeature-classCategory
-        self.query_features = query_features
-        self.classFeature = classFeature
-        self.classCategory = classCategory
-        self.scores_dictionary = self.get_scores_from_featlist(self.query_features, self.classFeature, self.classCategory, Xt)
-    
-    # Use the scores dictionary of the already trained model to classify the test data Xv
-    def predict(self, Xv):
-
-        # Use the dictionary of scores to calculate the associated sum of scores for every user
-        user_scores = self.get_scores_from_featlist_per_user(self.query_features, self.scores_dictionary, Xv)
-        
-        # Store all the score-related information in a dataframe
-        sum_scores = pd.DataFrame(user_scores.sum(axis=1))
-        user_scores = user_scores.join(sum_scores)
-        user_scores = user_scores.rename(columns={0: "total_score"})
-        self.predicted_scores = user_scores.copy()
-    
-    # Use the scores dictionary of the already trained model to predict the scores of the test data Xv
-    def get_predicted_scores(self):
-        # Return the predicted scores from the self.predicted_scores table
-        return pd.DataFrame(self.predicted_scores["total_score"])
-    
-    # Use the scores dictionary of the already trained model to perform a classification of the test data Xv
-    def get_predicted_labels(self):
-        # Evaluate whether the total_score > 0. Classify as 1 if total_score > 0, or 0 if total_score <= 0
-        labels = pd.DataFrame(self.predicted_scores.eval('total_score > 0').replace(True, 1).replace(False, 0))
-        label_name = "predicted_" + self.classFeature
-        return labels.rename(columns={0: label_name})
-
-class GNB(BayesianModel):
+class NB(BayesianModel):
     
     # Class constructor
     def __init__(self):
@@ -438,13 +396,19 @@ class GNB(BayesianModel):
         self.queries = queries
         self.classFeature = classFeature
         self.classCategory = classCategory
-        self.scores_dictionary = self.get_scores_from_featlist_and_catlist(self.queries, self.classFeature, self.classCategory, Xt)
+        if type(self.queries) is dict:
+            self.scores_dictionary = self.get_scores_from_featlist_and_catlist(self.queries, self.classFeature, self.classCategory, Xt)
+        elif type(self.queries) is list:
+            self.scores_dictionary = self.get_scores_from_featlist(self.queries, self.classFeature, self.classCategory, Xt)
     
     # Use the scores dictionary of the already trained model to classify the test data Xv
     def predict(self, Xv):
 
         # Use the dictionary of scores to calculate the associated sum of scores for every user
-        user_scores = self.get_scores_from_featlist_and_catlist_per_user(self.queries, self.scores_dictionary, Xv)
+        if type(self.queries) is dict:
+            user_scores = self.get_scores_from_featlist_and_catlist_per_user(self.queries, self.scores_dictionary, Xv)
+        elif type(self.queries) is list:
+            user_scores = self.get_scroes_from_featlist_per_user(self.queries, self.scores_dictionary, Xv)
         
         # Store all the score-related information in a dataframe
         sum_scores = pd.DataFrame(user_scores.sum(axis=1))
