@@ -385,6 +385,7 @@ class NB(BayesianModel):
     # Class constructor
     def __init__(self):
         self.scores_dictionary = {}
+        self.scores_dictionary_full = {}
         self.predicted_scores = {}
         self.queries = {}
         self.classFeature = ""
@@ -398,8 +399,10 @@ class NB(BayesianModel):
         self.classCategory = classCategory
         if type(self.queries) is dict:
             self.scores_dictionary = self.get_scores_from_featlist_and_catlist(self.queries, self.classFeature, self.classCategory, Xt)
+            self.scores_dictionary_full = self.get_scores_from_featlist_and_catlist_full(self.queries, self.classFeature, self.classCategory, Xt)
         elif type(self.queries) is list:
             self.scores_dictionary = self.get_scores_from_featlist(self.queries, self.classFeature, self.classCategory, Xt)
+            self.scores_dictionary_full = self.get_scores_from_featlist_full(self.queries, self.classFeature, self.classCategory, Xt)
     
     # Use the scores dictionary of the already trained model to classify the test data Xv
     def predict(self, Xv):
@@ -437,7 +440,7 @@ class Validation:
     # Run a CV of the GNB model and perform a decile analysis of its results
     def run_cv(self, X, qF, cF, cC, folds, plot_name):
 
-        kf = KFold(n_splits = 5, shuffle=True)
+        kf = KFold(n_splits = folds, shuffle=True)
 
         tprs = []
         aucs = []
