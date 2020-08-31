@@ -133,6 +133,15 @@ class ProbModel:
             p = 0
         #return {'P': p, 'nx': nx, 'ncx': ncx}
         return p
+
+    def get_cond_prob_full(self, feature_1, category_1, feature_2, category_2, data):
+        ncx = self.get_ncx(feature_1, category_1, feature_2, category_2, data)
+        nx = self.get_nx(feature_2, category_2, data)
+        if nx != 0:
+            p = ncx / float(nx)
+        else:
+            p = 0
+        return {'P': p, 'nx': nx, 'ncx': ncx}
     
     
     # Get the epsilon of a feature-category in relation to a classFeature-classCategory
@@ -411,7 +420,7 @@ class NB(BayesianModel):
         if type(self.queries) is dict:
             user_scores = self.get_scores_from_featlist_and_catlist_per_user(self.queries, self.scores_dictionary, Xv)
         elif type(self.queries) is list:
-            user_scores = self.get_scroes_from_featlist_per_user(self.queries, self.scores_dictionary, Xv)
+            user_scores = self.get_scores_from_featlist_per_user(self.queries, self.scores_dictionary, Xv)
         
         # Store all the score-related information in a dataframe
         sum_scores = pd.DataFrame(user_scores.sum(axis=1))
