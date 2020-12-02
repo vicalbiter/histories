@@ -434,11 +434,12 @@ class NB(BayesianModel):
         return pd.DataFrame(self.predicted_scores["total_score"])
     
     # Use the scores dictionary of the already trained model to perform a classification of the test data Xv
-    def get_predicted_labels(self):
-        # Evaluate whether the total_score > 0. Classify as 1 if total_score > 0, or 0 if total_score <= 0
-        labels = pd.DataFrame(self.predicted_scores.eval('total_score > 0').replace(True, 1).replace(False, 0))
+    def get_predicted_labels(self, threshold):
+        # Evaluate whether the total_score > threshold. Classify as 1 if total_score > 0, or 0 if total_score <= 0
+        labels = pd.DataFrame(self.get_predicted_scores() > threshold).replace(True, 1).replace(False, 0)
+        
         label_name = "predicted_" + self.classFeature
-        return labels.rename(columns={0: label_name})
+        return labels.rename(columns={"total_score": label_name})
 
 class Validation:
     
