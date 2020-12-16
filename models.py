@@ -249,7 +249,7 @@ class BayesianModel(ProbModel):
         #     score = 0
     
         # With smoothing
-        pxc = (ncx + 1) / float(nc)
+        pxc = (ncx + 1) / float(nc + 2)
         pxnc = (nx - ncx + 1) / float(n - nc + 2)
         score = math.log(pxc/pxnc)
         return score
