@@ -1,0 +1,17 @@
+All Data
+GNB
+	ROC AUC - 0.608
+	PRC AUC - 0.282
+NBA
+	ROC AUC - 0.606
+	PRC AUC - 0.306
+
+Low Noise
+GNB
+	ROC AUC - 0.61
+	PRC AUC - 0.38
+
+NBA 
+	ROC AUC - 0.584
+	PRC AUC - 0.308
+
